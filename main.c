@@ -62,7 +62,7 @@ do_round(struct receive_ctx *rctx, int fd, struct sockaddr_in *saddr)
 	receive_context_prepare(rctx, -1, -1);
 
 	if (receive_context_do_receive(fd, rctx, rctx->n_packets) == -1) {
-		perror("recvmmsg");
+		perror("receive_context");
 		return -1;
 	}
 
