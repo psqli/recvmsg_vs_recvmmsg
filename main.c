@@ -98,7 +98,6 @@ time_diff(struct timespec *diff,
 	}
 }
 
-/* based on _tests/recvmmsg_test.c */
 int
 main(int argc, char **argv)
 {
