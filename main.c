@@ -67,16 +67,20 @@ do_round(struct receive *r, int fd, struct sockaddr_in *saddr)
 	}
 
 #if 0
-	struct mmsghdr *current;
-	receive_context_for_each (rctx, current) {
+	/* This is a test */
+
+	for (i = 0; i < r->n_packets; i++) {
+		struct mmsghdr *current;
 		char *tmp_str;
+
+		current = &r->packets[i];
 
 		if (!current->msg_len)
 			continue;
 
 		tmp_str = current->msg_hdr.msg_iov->iov_base;
 		tmp_str[current->msg_len - 1] = '\0';
-		printf("msg %d: %s\n", rctx->current_packet, tmp_str);
+		printf("msg %d: %s\n", i, tmp_str);
 	}
 #endif
 
