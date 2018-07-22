@@ -180,10 +180,10 @@ receive_context_init(struct receive_ctx *ctx, unsigned int flags)
 		current->msg_flags = 0;
 	}
 
-	if (flags & RECVCTX_USE_RECVMMSG)
-		ctx->do_recv = do_receive_recvmmsg;
-	else
+	if (flags & RECVCTX_USE_RECVMSG)
 		ctx->do_recv = do_receive_recvmsg;
+	else
+		ctx->do_recv = do_receive_recvmmsg;
 
 	return 0;
 }

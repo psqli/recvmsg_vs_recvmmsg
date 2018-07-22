@@ -46,7 +46,7 @@ help(void)
 "-b <buffer_size> Number of packets allocated to send per round.\n"
 "-c <round_count> Number of rounds (send + receive) to run.\n"
 "   Every round sends and reads buffer_size entries.\n"
-"-m Use recvmmsg(). If not specified, use recvmsg().\n");
+"-m Use recvmsg(). If not specified, use recvmmsg().\n");
 }
 
 static int
@@ -151,7 +151,7 @@ main(int argc, char **argv)
 			}
 			break;
 		case 'm':
-			flags = RECVCTX_USE_RECVMMSG;
+			flags = RECVCTX_USE_RECVMSG;
 			break;
 		case 'h':
 			help();
@@ -166,10 +166,10 @@ main(int argc, char **argv)
 
 	port = atoi(argv[optind]);
 
-	if (flags & RECVCTX_USE_RECVMMSG)
-		printf("Using recvmmsg()\n");
-	else
+	if (flags & RECVCTX_USE_RECVMSG)
 		printf("Using recvmsg()\n");
+	else
+		printf("Using recvmmsg()\n");
 
 	/*
 	 * initialize socket

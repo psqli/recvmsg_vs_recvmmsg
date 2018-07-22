@@ -37,7 +37,7 @@ struct receive_ctx {
 };
 
 /* flags */
-#define RECVCTX_USE_RECVMMSG (1 << 0)
+#define RECVCTX_USE_RECVMSG (1 << 0)
 
 int
 receive_context_prepare(struct receive_ctx *ctx, int custom_addr_len,
