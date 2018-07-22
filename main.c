@@ -50,18 +50,18 @@ help(void)
 }
 
 static int
-do_round(struct receive_ctx *rctx, int fd, struct sockaddr_in *saddr)
+do_round(struct receive *r, int fd, struct sockaddr_in *saddr)
 {
 	int i;
 	char str[] = "Hello world!";
 
-	for (i = 0; i < rctx->n_packets; i++)
+	for (i = 0; i < r->n_packets; i++)
 		sendto(fd, str, sizeof(str), 0,
 		       (struct sockaddr*) saddr, sizeof(*saddr));
 
-	receive_context_prepare(rctx, -1, -1);
+	receive_prepare(r, -1, -1);
 
-	if (receive_context_do_receive(fd, rctx, rctx->n_packets) == -1) {
+	if (receive(fd, r, r->n_packets) == -1) {
 		perror("receive_context");
 		return -1;
 	}
@@ -111,7 +111,7 @@ main(int argc, char **argv)
 	int fd;
 	struct sockaddr_in saddr;
 	/* buffer stuff */
-	struct receive_ctx rctx;
+	struct receive receive;
 
 	struct timespec start;
 	struct timespec stop;
@@ -191,11 +191,11 @@ main(int argc, char **argv)
 	 * ==================
 	 */
 
-	rctx.n_packets = buffer_size;
-	rctx.addr_len = sizeof(struct sockaddr_in);
-	rctx.buffer_len = 512;
-	rctx.control_len = 0;
-	receive_context_init(&rctx, flags);
+	receive.n_packets = buffer_size;
+	receive.addr_len = sizeof(struct sockaddr_in);
+	receive.buffer_len = 512;
+	receive.control_len = 0;
+	receive_init(&receive, flags);
 
 	/*
 	 * run test
@@ -205,7 +205,7 @@ main(int argc, char **argv)
 	clock_gettime(CLOCK_MONOTONIC, &start);
 	while (n_to_send--) {
 		/* TODO: error handling */
-		do_round(&rctx, fd, &saddr);
+		do_round(&receive, fd, &saddr);
 	}
 	clock_gettime(CLOCK_MONOTONIC, &stop);
 
@@ -216,7 +216,7 @@ main(int argc, char **argv)
 	       diff.tv_nsec % 1000000);
 
 //_go_destroy_buffers:
-	receive_context_destroy(&rctx);
+	receive_destroy(&receive);
 _go_close_socket:
 	close(fd);
 

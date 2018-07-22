@@ -58,22 +58,22 @@ do_receive_recvmsg(int fd, struct mmsghdr *msgvec, unsigned int vlen)
 
 /* set custom_* to -1 if you want defaults */
 int
-receive_context_prepare(struct receive_ctx *ctx, int custom_addr_len,
+receive_prepare(struct receive *r, int custom_addr_len,
                         int custom_control_len)
 {
-	size_t addr_len = ctx->addr_len;
-	size_t control_len = ctx->control_len;
+	size_t addr_len = r->addr_len;
+	size_t control_len = r->control_len;
 	int i;
 	struct msghdr *current;
 
-	if (custom_addr_len != -1 && custom_addr_len <= ctx->addr_len)
+	if (custom_addr_len != -1 && custom_addr_len <= r->addr_len)
 		addr_len = custom_addr_len;
-	if (custom_control_len != -1 && custom_control_len <= ctx->control_len)
+	if (custom_control_len != -1 && custom_control_len <= r->control_len)
 		control_len = custom_control_len;
 
-	i = ctx->n_packets;
+	i = r->n_packets;
 	while (i--) {
-		current = &ctx->packets[i].msg_hdr;
+		current = &r->packets[i].msg_hdr;
 		current->msg_namelen = addr_len;
 		current->msg_controllen = control_len;
 		//memset(current->msg_control, 0, control_len);
@@ -83,15 +83,14 @@ receive_context_prepare(struct receive_ctx *ctx, int custom_addr_len,
 }
 
 int
-receive_context_do_receive(int fd, struct receive_ctx *ctx,
-                           unsigned int n_packets)
+receive(int fd, struct receive *r, unsigned int n_packets)
 {
 	int tmp;
 
-	if (n_packets == 0 || n_packets > ctx->n_packets)
-		n_packets = ctx->n_packets;
+	if (n_packets == 0 || n_packets > r->n_packets)
+		n_packets = r->n_packets;
 
-	tmp = ctx->do_recv(fd, ctx->packets, n_packets);
+	tmp = r->do_recv(fd, r->packets, n_packets);
 	if (tmp == -1)
 		return -1;
 
@@ -99,9 +98,9 @@ receive_context_do_receive(int fd, struct receive_ctx *ctx,
 }
 
 void
-receive_context_destroy(struct receive_ctx *ctx)
+receive_destroy(struct receive *r)
 {
-	free(ctx->packets);
+	free(r->packets);
 }
 
 /*
@@ -123,7 +122,7 @@ receive_context_destroy(struct receive_ctx *ctx)
  *   control_len = TODO
  */
 int
-receive_context_init(struct receive_ctx *ctx, unsigned int flags)
+receive_init(struct receive *r, unsigned int flags)
 {
 	size_t size_to_allocate;
 	void *tmp;
@@ -132,10 +131,10 @@ receive_context_init(struct receive_ctx *ctx, unsigned int flags)
 
 	/* mmsghdr structures + per packet data used in msghdr */
 	size_to_allocate =
-	  ctx->n_packets *
+	  r->n_packets *
 	  (
-	    sizeof(*ctx->packets) + ctx->addr_len + sizeof(struct iovec) +
-	    ctx->buffer_len + ctx->control_len
+	    sizeof(*r->packets) + r->addr_len + sizeof(struct iovec) +
+	    r->buffer_len + r->control_len
 	  );
 
 	/* allocate all memory in just one malloc() */
@@ -144,22 +143,22 @@ receive_context_init(struct receive_ctx *ctx, unsigned int flags)
 	/* TODO: do memory locking */
 
 	/* assign an address to the array of `struct mmsghdr` */
-	ctx->packets = tmp;
-	tmp += sizeof(*ctx->packets) * ctx->n_packets;
+	r->packets = tmp;
+	tmp += sizeof(*r->packets) * r->n_packets;
 
 	/* prepare individual packets */
-	i = ctx->n_packets;
+	i = r->n_packets;
 	while (i--) {
 		/*
-		 * ctx->packets[i].msg_len  contains the number of read bytes
+		 * r->packets[i].msg_len  contains the number of read bytes
 		 * after recvmmsg() call
 		 */
-		current = &ctx->packets[i].msg_hdr;
+		current = &r->packets[i].msg_hdr;
 
 		/* it's the "address return space" (e.g. struct sockaddr_in) */
-		current->msg_namelen = ctx->addr_len;
-		current->msg_name = ctx->addr_len ? tmp : NULL;
-		tmp += ctx->addr_len;
+		current->msg_namelen = r->addr_len;
+		current->msg_name = r->addr_len ? tmp : NULL;
+		tmp += r->addr_len;
 
 		/* only one IO vector is used */
 		current->msg_iovlen = 1; /* # iovec structs in msg_iov */
@@ -167,23 +166,23 @@ receive_context_init(struct receive_ctx *ctx, unsigned int flags)
 		tmp += sizeof(struct iovec);
 
 		/* set up the packet's buffer */
-		current->msg_iov[0].iov_len = ctx->buffer_len;
+		current->msg_iov[0].iov_len = r->buffer_len;
 		current->msg_iov[0].iov_base = tmp;
-		tmp += ctx->buffer_len;
+		tmp += r->buffer_len;
 
 		/* used to receive control messages */
-		current->msg_controllen = ctx->control_len;
-		current->msg_control = ctx->control_len ? tmp : NULL;
-		tmp += ctx->control_len;
+		current->msg_controllen = r->control_len;
+		current->msg_control = r->control_len ? tmp : NULL;
+		tmp += r->control_len;
 
 		/* flags for this packet */
 		current->msg_flags = 0;
 	}
 
 	if (flags & RECVCTX_USE_RECVMSG)
-		ctx->do_recv = do_receive_recvmsg;
+		r->do_recv = do_receive_recvmsg;
 	else
-		ctx->do_recv = do_receive_recvmmsg;
+		r->do_recv = do_receive_recvmmsg;
 
 	return 0;
 }

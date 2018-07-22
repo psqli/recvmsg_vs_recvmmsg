@@ -21,7 +21,7 @@
 
 #include <sys/socket.h> /* `struct mmsghdr` */
 
-struct receive_ctx {
+struct receive {
 	unsigned int n_packets;
 	/* inside each packet context: */
 	/* the address won't be returned if user set addr_len to 0 */
@@ -40,17 +40,17 @@ struct receive_ctx {
 #define RECVCTX_USE_RECVMSG (1 << 0)
 
 int
-receive_context_prepare(struct receive_ctx *ctx, int custom_addr_len,
+receive_prepare(struct receive *r, int custom_addr_len,
                         int custom_control_len);
 
 int
-receive_context_do_receive(int fd, struct receive_ctx *ctx,
+receive(int fd, struct receive *r,
                            unsigned int n_packets);
 
 void
-receive_context_destroy(struct receive_ctx *ctx);
+receive_destroy(struct receive *r);
 
 int
-receive_context_init(struct receive_ctx *ctx, unsigned int flags);
+receive_init(struct receive *r, unsigned int flags);
 
 #endif /* RECVCTX_H */
