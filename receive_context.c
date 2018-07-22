@@ -56,22 +56,6 @@ do_receive_recvmsg(int fd, struct mmsghdr *msgvec, unsigned int vlen)
 	return i;
 }
 
-/* get an unread packet */
-struct mmsghdr*
-receive_context_get_packet(struct receive_ctx *ctx)
-{
-	struct mmsghdr *packet;
-
-	if (ctx->unread_packets == 0)
-		return NULL;
-
-	packet = &ctx->packets[ctx->current_packet];
-	ctx->current_packet++;
-	ctx->unread_packets--;
-
-	return packet;
-}
-
 /* set custom_* to -1 if you want defaults */
 int
 receive_context_prepare(struct receive_ctx *ctx, int custom_addr_len,
@@ -110,9 +94,6 @@ receive_context_do_receive(int fd, struct receive_ctx *ctx,
 	tmp = ctx->do_recv(fd, ctx->packets, n_packets);
 	if (tmp == -1)
 		return -1;
-
-	ctx->unread_packets = tmp;
-	ctx->current_packet = 0;
 
 	return tmp;
 }
@@ -198,9 +179,6 @@ receive_context_init(struct receive_ctx *ctx, unsigned int flags)
 		/* flags for this packet */
 		current->msg_flags = 0;
 	}
-
-	/* set full state */
-	ctx->current_packet = ctx->n_packets;
 
 	if (flags & RECVCTX_USE_RECVMMSG)
 		ctx->do_recv = do_receive_recvmmsg;

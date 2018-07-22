@@ -34,9 +34,6 @@ struct receive_ctx {
 
 	/* array of size `n_packets` */
 	struct mmsghdr *packets;
-	/* current unread packet and last one */
-	unsigned int current_packet;
-	unsigned int unread_packets;
 };
 
 /* flags */
@@ -48,9 +45,6 @@ struct receive_ctx {
 	     (ctx)->current_packet != (ctx)->n_packets; \
 	     (ctx)->current_packet++, \
 	       packet = &(ctx)->packets[(ctx)->current_packet])
-
-struct mmsghdr*
-receive_context_get_packet(struct receive_ctx *ctx);
 
 int
 receive_context_prepare(struct receive_ctx *ctx, int custom_addr_len,
