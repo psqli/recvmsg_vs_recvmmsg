@@ -39,13 +39,6 @@ struct receive_ctx {
 /* flags */
 #define RECVCTX_USE_RECVMMSG (1 << 0)
 
-#define receive_context_for_each(ctx, packet) \
-	for ((ctx)->current_packet = 0, \
-	       packet = &(ctx)->packets[(ctx)->current_packet]; \
-	     (ctx)->current_packet != (ctx)->n_packets; \
-	     (ctx)->current_packet++, \
-	       packet = &(ctx)->packets[(ctx)->current_packet])
-
 int
 receive_context_prepare(struct receive_ctx *ctx, int custom_addr_len,
                         int custom_control_len);
