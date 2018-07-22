@@ -30,7 +30,7 @@
 #include <stdlib.h>     /* malloc() */
 #include <sys/socket.h> /* recvmsg() recvmmsg() */
 
-#include "receive_context.h"
+#include "receive.h"
 
 static int
 do_receive_recvmmsg(int fd, struct mmsghdr *msgvec, unsigned int vlen)

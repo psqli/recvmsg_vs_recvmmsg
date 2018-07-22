@@ -29,7 +29,7 @@
 #include <time.h>       /* clock_gettime() */
 #include <unistd.h>     /* close() getopt() */
 
-#include "receive_context.h"
+#include "receive.h"
 
 static void
 usage(void)
