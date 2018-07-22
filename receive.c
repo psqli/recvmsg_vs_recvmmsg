@@ -104,22 +104,30 @@ receive_destroy(struct receive *r)
 }
 
 /*
- * Allocations we do ...
- * - We allocate (n_packets * `struct mmsghdr`) for recvmmsg(). Each
- *   `struct mmsghdr` has one `struct msghdr`. See recvmmsg(2) manual.
- * For each `struct msghdr` we allocate:
- * - A space of size (ctx->addr_len) where network peer address is going to be
- *   returned. It can be omitted by setting ctx->addr_len to zero.
- * - One IO vector structure (msg_iov).
- * - A buffer of size (ctx->buffer_len) where the received data will be placed.
- * - And, optionally, a struct which may have additional data (msg_control).
+ * Allocations done:
  *
- * when receiving from network ipv4:
- *   addr_len = sizeof(struct sockaddr_in)
- *   control_len = 0
- * when receiving from another process (Inter Process Communication):
- *   addr_len = sizeof(struct sockaddr_un)
- *   control_len = TODO
+ * - We allocate (n_packets * `struct mmsghdr`). Each
+ *   `struct mmsghdr` has one `struct msghdr`. See
+ *   recvmmsg.2 manual.
+ *
+ * For each `struct msghdr` it's allocated:
+ *
+ * - A space (msg_name) to return network peer address
+ *   (e.g. `struct sockaddr_in`). The `addr_len` variable
+ *   defines the size of this space. Setting to zero makes
+ *   no allocation.
+ *
+ * - One IO vector structure (msg_iov). See readv.2 manual.
+ *
+ * - A buffer of size `buffer_len` where the received data
+ *   will be placed.
+ *
+ * - A space (msg_control) which may carry additional data.
+ *   It can be omitted by setting `control_len` to zero.
+ *
+ * When receiving from ipv4 socket, addr_len must be set
+ * to sizeof(struct sockaddr_in). For unix socket,
+ * sizeof(struct sockaddr_un).
  */
 int
 receive_init(struct receive *r, unsigned int flags)
