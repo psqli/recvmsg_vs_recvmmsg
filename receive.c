@@ -59,7 +59,7 @@ do_receive_recvmsg(int fd, struct mmsghdr *msgvec, unsigned int vlen)
 /* set custom_* to -1 if you want defaults */
 int
 receive_prepare(struct receive *r, int custom_addr_len,
-                        int custom_control_len)
+                int custom_control_len)
 {
 	size_t addr_len = r->addr_len;
 	size_t control_len = r->control_len;
