@@ -62,7 +62,7 @@ do_round(struct receive *r, int fd, struct sockaddr_in *saddr)
 	receive_prepare(r, -1, -1);
 
 	if (receive(fd, r, r->n_packets) == -1) {
-		perror("receive_context");
+		perror("receive");
 		return -1;
 	}
 
@@ -155,7 +155,7 @@ main(int argc, char **argv)
 			}
 			break;
 		case 'm':
-			flags = RECVCTX_USE_RECVMSG;
+			flags = RECEIVE_USE_RECVMSG;
 			break;
 		case 'h':
 			help();
@@ -170,7 +170,7 @@ main(int argc, char **argv)
 
 	port = atoi(argv[optind]);
 
-	if (flags & RECVCTX_USE_RECVMSG)
+	if (flags & RECEIVE_USE_RECVMSG)
 		printf("Using recvmsg()\n");
 	else
 		printf("Using recvmmsg()\n");
@@ -191,8 +191,8 @@ main(int argc, char **argv)
 		goto _go_close_socket; /* NOTE: yet returning zero */
 
 	/*
-	 * initialize recvctx
-	 * ==================
+	 * initialize receive interface
+	 * ============================
 	 */
 
 	receive.n_packets = buffer_size;

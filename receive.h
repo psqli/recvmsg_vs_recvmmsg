@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RECVCTX_H
-#define RECVCTX_H
+#ifndef RECEIVE_H
+#define RECEIVE_H
 
 #include <sys/socket.h> /* `struct mmsghdr` */
 
@@ -37,7 +37,7 @@ struct receive {
 };
 
 /* flags */
-#define RECVCTX_USE_RECVMSG (1 << 0)
+#define RECEIVE_USE_RECVMSG (1 << 0)
 
 int
 receive_prepare(struct receive *r, int custom_addr_len,
@@ -53,4 +53,4 @@ receive_destroy(struct receive *r);
 int
 receive_init(struct receive *r, unsigned int flags);
 
-#endif /* RECVCTX_H */
+#endif /* RECEIVE_H */

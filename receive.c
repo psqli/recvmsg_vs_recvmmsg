@@ -187,7 +187,7 @@ receive_init(struct receive *r, unsigned int flags)
 		current->msg_flags = 0;
 	}
 
-	if (flags & RECVCTX_USE_RECVMSG)
+	if (flags & RECEIVE_USE_RECVMSG)
 		r->do_recv = do_receive_recvmsg;
 	else
 		r->do_recv = do_receive_recvmmsg;
