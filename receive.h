@@ -41,11 +41,10 @@ struct receive {
 
 int
 receive_prepare(struct receive *r, int custom_addr_len,
-                        int custom_control_len);
+                int custom_control_len);
 
 int
-receive(int fd, struct receive *r,
-                           unsigned int n_packets);
+receive(int fd, struct receive *r, unsigned int n_packets);
 
 void
 receive_destroy(struct receive *r);
