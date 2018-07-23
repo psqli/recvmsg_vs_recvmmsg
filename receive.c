@@ -177,6 +177,11 @@ receive_allocate_buffer(struct receive *r, unsigned int flags)
 		current->msg_name = r->addr_len ? tmp : NULL;
 		tmp += r->addr_len;
 
+		/* used to receive control messages */
+		current->msg_controllen = r->control_len;
+		current->msg_control = r->control_len ? tmp : NULL;
+		tmp += r->control_len;
+
 		/* only one IO vector is used */
 		current->msg_iovlen = 1; /* # iovec structs in msg_iov */
 		current->msg_iov = tmp;
@@ -186,11 +191,6 @@ receive_allocate_buffer(struct receive *r, unsigned int flags)
 		current->msg_iov[0].iov_len = r->buffer_len;
 		current->msg_iov[0].iov_base = tmp;
 		tmp += r->buffer_len;
-
-		/* used to receive control messages */
-		current->msg_controllen = r->control_len;
-		current->msg_control = r->control_len ? tmp : NULL;
-		tmp += r->control_len;
 
 		/* flags for this packet */
 		current->msg_flags = 0;
