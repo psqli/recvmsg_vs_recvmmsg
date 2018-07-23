@@ -42,14 +42,17 @@ static int
 do_receive_recvmsg(int fd, struct mmsghdr *msgvec, unsigned int vlen)
 {
 	int i;
+	int tmp;
 
 	for (i = 0; i < vlen; i++) {
-		msgvec[i].msg_len = recvmsg(fd, &msgvec[i].msg_hdr, 0);
-		if (msgvec[i].msg_len == -1) {
-			if (errno == EAGAIN)
+		tmp = recvmsg(fd, &msgvec[i].msg_hdr, 0);
+		if (tmp == -1) {
+			if (i)
 				break;
 			return -1;
 		}
+
+		msgvec[i].msg_len = tmp;
 	}
 
 	/* i corresponds to the number of messages received */
