@@ -65,7 +65,16 @@ do_receive_recvmsg(int fd, struct mmsghdr *msgvec, unsigned int vlen,
 	return i;
 }
 
-/* set custom_* to -1 if you want defaults */
+/*
+ * set custom_* to -1 if you want defaults
+ *
+ * msg_namelen, msg_controllen and msg_flags are
+ * modified by the kernel. See ___sys_recvmsg() on
+ * net/socket.c from Linux kernel tree.
+ *
+ * For msg_namelen, if it's greater than kernel expects,
+ * move_addr_to_user() truncates it.
+ */
 int
 receive_prepare(struct receive *r, int custom_addr_len,
                 int custom_control_len)
