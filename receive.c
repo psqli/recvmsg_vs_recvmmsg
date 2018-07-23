@@ -98,7 +98,7 @@ receive(int fd, struct receive *r, unsigned int n_packets)
 }
 
 void
-receive_destroy(struct receive *r)
+receive_free_buffer(struct receive *r)
 {
 	free(r->packets);
 }
@@ -130,7 +130,7 @@ receive_destroy(struct receive *r)
  * sizeof(struct sockaddr_un).
  */
 int
-receive_init(struct receive *r, unsigned int flags)
+receive_allocate_buffer(struct receive *r, unsigned int flags)
 {
 	size_t size_to_allocate;
 	void *tmp;

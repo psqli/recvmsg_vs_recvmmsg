@@ -47,9 +47,9 @@ int
 receive(int fd, struct receive *r, unsigned int n_packets);
 
 void
-receive_destroy(struct receive *r);
+receive_free_buffer(struct receive *r);
 
 int
-receive_init(struct receive *r, unsigned int flags);
+receive_allocate_buffer(struct receive *r, unsigned int flags);
 
 #endif /* RECEIVE_H */

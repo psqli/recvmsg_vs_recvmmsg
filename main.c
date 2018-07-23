@@ -199,7 +199,7 @@ main(int argc, char **argv)
 	receive.addr_len = sizeof(struct sockaddr_in);
 	receive.buffer_len = 512;
 	receive.control_len = 0;
-	receive_init(&receive, flags);
+	receive_allocate_buffer(&receive, flags);
 
 	/*
 	 * run test
@@ -220,7 +220,7 @@ main(int argc, char **argv)
 	       diff.tv_nsec % 1000000);
 
 //_go_destroy_buffers:
-	receive_destroy(&receive);
+	receive_free_buffer(&receive);
 _go_close_socket:
 	close(fd);
 
