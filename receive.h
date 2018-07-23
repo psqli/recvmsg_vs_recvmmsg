@@ -30,7 +30,8 @@ struct receive {
 	size_t control_len;
 
 	/* receive function */
-	int (*do_recv)(int fd, struct mmsghdr *msgvec, unsigned int vlen);
+	int (*do_recv)(int fd, struct mmsghdr *msgvec, unsigned int vlen,
+	               unsigned int flags);
 
 	/* array of size `n_packets` */
 	struct mmsghdr *packets;
@@ -44,7 +45,7 @@ receive_prepare(struct receive *r, int custom_addr_len,
                 int custom_control_len);
 
 int
-receive(int fd, struct receive *r, unsigned int n_packets);
+receive(int fd, struct receive *r, unsigned int n_packets, unsigned int flags);
 
 void
 receive_free_buffer(struct receive *r);

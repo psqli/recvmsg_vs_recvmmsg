@@ -33,19 +33,21 @@
 #include "receive.h"
 
 static int
-do_receive_recvmmsg(int fd, struct mmsghdr *msgvec, unsigned int vlen)
+do_receive_recvmmsg(int fd, struct mmsghdr *msgvec, unsigned int vlen,
+                    unsigned int flags)
 {
-	return recvmmsg(fd, msgvec, vlen, 0, NULL);
+	return recvmmsg(fd, msgvec, vlen, flags, NULL);
 }
 
 static int
-do_receive_recvmsg(int fd, struct mmsghdr *msgvec, unsigned int vlen)
+do_receive_recvmsg(int fd, struct mmsghdr *msgvec, unsigned int vlen,
+                   unsigned int flags)
 {
 	int i;
 	int tmp;
 
 	for (i = 0; i < vlen; i++) {
-		tmp = recvmsg(fd, &msgvec[i].msg_hdr, 0);
+		tmp = recvmsg(fd, &msgvec[i].msg_hdr, flags & ~MSG_WAITFORONE);
 		if (tmp == -1) {
 			if (i)
 				break;
@@ -53,6 +55,10 @@ do_receive_recvmsg(int fd, struct mmsghdr *msgvec, unsigned int vlen)
 		}
 
 		msgvec[i].msg_len = tmp;
+
+		/* MSG_WAITFORONE turns on MSG_DONTWAIT after one packet */
+		if (flags & MSG_WAITFORONE)
+			flags |= MSG_DONTWAIT;
 	}
 
 	/* i corresponds to the number of messages received */
@@ -86,14 +92,14 @@ receive_prepare(struct receive *r, int custom_addr_len,
 }
 
 int
-receive(int fd, struct receive *r, unsigned int n_packets)
+receive(int fd, struct receive *r, unsigned int n_packets, unsigned int flags)
 {
 	int tmp;
 
 	if (n_packets == 0 || n_packets > r->n_packets)
 		n_packets = r->n_packets;
 
-	tmp = r->do_recv(fd, r->packets, n_packets);
+	tmp = r->do_recv(fd, r->packets, n_packets, flags);
 	if (tmp == -1)
 		return -1;
 

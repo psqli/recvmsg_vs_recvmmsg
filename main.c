@@ -61,7 +61,7 @@ do_round(struct receive *r, int fd, struct sockaddr_in *saddr)
 
 	receive_prepare(r, -1, -1);
 
-	if (receive(fd, r, r->n_packets) == -1) {
+	if (receive(fd, r, r->n_packets, 0) == -1) {
 		perror("receive");
 		return -1;
 	}
