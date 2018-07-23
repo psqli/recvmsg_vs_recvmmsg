@@ -141,7 +141,8 @@ receive_free_buffer(struct receive *r)
  *   will be placed.
  *
  * - A space (msg_control) which may carry additional data.
- *   It can be omitted by setting `control_len` to zero.
+ *   See cmsg.3 manual. It can be omitted by setting
+ *   `control_len` to zero.
  *
  * When receiving from ipv4 socket, addr_len must be set
  * to sizeof(struct sockaddr_in). For unix socket,
