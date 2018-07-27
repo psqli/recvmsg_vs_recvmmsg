@@ -23,7 +23,7 @@ How to use
 	-c <round_count> Number of rounds (send + receive)
 	   to run. Every round sends and reads buffer_size
 	   entries.
-	-m Use recvmmsg(). If not specified, use recvmsg().
+	-m Use recvmsg(). If not specified, use recvmmsg().
 
 
 How it works?
